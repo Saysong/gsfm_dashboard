@@ -1,0 +1,21 @@
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.4fr;
+    grid-template-rows: 3fr 1fr;
+    grid-template-areas:
+        "map livefeed camera"
+        "alerts sensorblock sensorblock";
+    gap: 20px;
+    height: calc(100% - 40px);
+    width: calc(100% - 40px);
+    margin: 20px;
+    color: white;
+    font-family: 'Arial, sans-serif';
+}
+.dashboard-grid>* {
+    background-color: rgba(28, 28, 28, 0.75);
+    border-radius: 12px;
+    padding: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+}
