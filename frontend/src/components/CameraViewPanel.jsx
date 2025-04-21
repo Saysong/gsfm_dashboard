@@ -1,12 +1,21 @@
+// src/components/CameraViewPanel.jsx
+
 import React from 'react';
 
+const cameraLabels = {
+  Vision: 'Color Camera',
+  Depth: 'Depth Camera',
+  USB: 'USB Camera',
+  Thermal: 'Thermal Camera',
+};
+
 function CameraViewPanel({ activeCamera, setActiveCamera, setViewMode }) {
-  const cameras = ['Vision', 'Thermal', 'Depth'];
+  const cameras = ['Vision', 'Depth', 'USB', 'Thermal'];
   const secondary = cameras.filter((c) => c !== activeCamera);
 
   return (
-    <div>
-      <h2>Other Camera Views</h2>
+    <div style={{ padding: '1em' }}>
+      <h3 style={{ color: 'white' }}>Other Camera Views</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         {secondary.map((cam) => (
           <div
@@ -17,7 +26,7 @@ function CameraViewPanel({ activeCamera, setActiveCamera, setViewMode }) {
             }}
             style={{
               height: '100px',
-              backgroundColor: '#333',
+              backgroundColor: '#222',
               borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
@@ -26,7 +35,7 @@ function CameraViewPanel({ activeCamera, setActiveCamera, setViewMode }) {
               border: '1px solid #555',
             }}
           >
-            <p style={{ color: 'white', fontSize: '0.9em' }}>{cam} Feed</p>
+            <p style={{ color: 'white', fontSize: '0.9em' }}>{cameraLabels[cam]} Feed</p>
           </div>
         ))}
       </div>

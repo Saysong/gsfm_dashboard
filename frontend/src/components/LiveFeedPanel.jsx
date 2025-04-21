@@ -1,11 +1,21 @@
-import React from 'react';
+// src/components/LiveFeedPanel.jsx
 
-function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera }) {
-  const cameras = ['Vision', 'Thermal', 'Depth'];
+import React from 'react';
+import GenericCameraFeed from './GenericCameraFeed';
+
+const cameraLabels = {
+  Vision: 'Color Camera',
+  Depth: 'Depth Camera',
+  USB: 'USB Camera',
+  Thermal: 'Thermal Camera',
+};
+
+function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, cameraFeeds }) {
+  const cameras = ['Vision', 'Depth', 'USB', 'Thermal'];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <h2>Live Feed</h2>
+      <h2 style={{ color: 'white' }}>Live Feed</h2>
 
       {/* View Mode Toggle */}
       <div style={{ marginBottom: '1em' }}>
@@ -43,7 +53,7 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera })
               }}
               onClick={() => setActiveCamera(cam)}
             >
-              {cam}
+              {cameraLabels[cam]}
             </button>
           ))}
         </div>
@@ -51,47 +61,33 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera })
 
       {/* Camera Feeds */}
       {viewMode === 'All' ? (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gridTemplateRows: '1fr 1fr',
-      gap: '1em',
-      flexGrow: 1,
-    }}
-  >
-    {['Vision', 'Thermal', 'Depth'].map((cam) => (
-      <div
-        key={cam}
-        style={{
-          backgroundColor: '#333',
-          borderRadius: '8px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <p>{cam} Feed</p>
-      </div>
-    ))}
-
-    {/* empty cell to keep 2x2 grid shape */}
-    <div style={{ backgroundColor: 'transparent' }} />
-  </div>
-) : (
-  <div
-    style={{
-      flexGrow: 1,
-      backgroundColor: '#333',
-      borderRadius: '8px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <p>{activeCamera} Feed (enlarged)</p>
-  </div>
-)}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gridTemplateRows: '1fr 1fr',
+            gap: '1em',
+            flexGrow: 1,
+          }}
+        >
+          {cameras.map((cam) => (
+            <div key={cam} style={{ backgroundColor: '#111', borderRadius: '6px' }}>
+              <GenericCameraFeed title={cameraLabels[cam]} base64Data={cameraFeeds[cam]} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{
+            flexGrow: 1,
+            backgroundColor: '#111',
+            borderRadius: '6px',
+            padding: '1em',
+          }}
+        >
+          <GenericCameraFeed title={cameraLabels[activeCamera]} base64Data={cameraFeeds[activeCamera]} />
+        </div>
+      )}
     </div>
   );
 }

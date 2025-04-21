@@ -1,9 +1,11 @@
+// src/components/CameraSystem.jsx
+
 import React, { useState } from 'react';
 import LiveFeedPanel from './LiveFeedPanel';
 import CameraViewPanel from './CameraViewPanel';
 
-function CameraSystem() {
-  const [viewMode, setViewMode] = useState('All'); // "All" or "Single"
+function CameraSystem({ cameraFeeds }) {
+  const [viewMode, setViewMode] = useState('All'); // 'All' or 'Single'
   const [activeCamera, setActiveCamera] = useState('Vision');
 
   return (
@@ -11,9 +13,9 @@ function CameraSystem() {
       <div style={{ gridArea: 'livefeed' }}>
         <LiveFeedPanel
           viewMode={viewMode}
-          setViewMode={setViewMode}
           activeCamera={activeCamera}
-          setActiveCamera={setActiveCamera}
+          setViewMode={setViewMode}
+          cameraFeeds={cameraFeeds}
         />
       </div>
       <div style={{ gridArea: 'camera' }}>
