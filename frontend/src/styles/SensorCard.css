@@ -1,0 +1,42 @@
+.sensor-card {
+    background-color: rgba(20, 20, 20, 0.85);
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 12px;
+    min-width: 120px;
+    height: auto;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sensor-card:hover {
+    box-shadow: 0 0 10px rgba(100, 255, 255, 0.2);
+}
+
+.sensor-label {
+    color: #ccc;
+    font-size: 0.85em;
+    margin-bottom: 4px;
+}
+
+.sensor-value {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #fff;
+}
+
+.sensor-value span {
+    font-size: 1.1em;
+}
+
+.sensor-graph {
+    margin-top: 0.5em;
+    text-align: center;
+}
+
+.sensor-graph button {
+    margin-top: 0.5em;
+}
