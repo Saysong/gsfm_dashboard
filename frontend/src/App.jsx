@@ -17,11 +17,11 @@ import { parseCompressedImage } from './handlers/cameraHandler';
 import ROSLIB from 'roslib';
 
 function App() {
-  const { ros, connected } = useRosBridge('ws://10.91.19.146:9090'); // replace with actual IP if needed
+  const { ros, connected } = useRosBridge('ws://10.91.19.146:9090'); // Update IP as needed
 
   const [imuData, setImuData] = useState(null);
   const [gasData, setGasData] = useState(null);
-  const [alertData, setAlertData] = useState(null);
+  const [alerts, setAlerts] = useState([]);
 
   const [cameraFeeds, setCameraFeeds] = useState({
     Vision: '',
@@ -33,7 +33,7 @@ function App() {
   useEffect(() => {
     if (!ros) return;
 
-    // IMU
+    // IMU subscription
     const imuSub = new ROSLIB.Topic({
       ros,
       name: IMU_TOPIC,
@@ -44,7 +44,7 @@ function App() {
       if (parsed) setImuData(parsed);
     });
 
-    // Gas + Alert
+    // Gas + Alert subscription
     const gasSub = new ROSLIB.Topic({
       ros,
       name: GAS_TOPIC,
@@ -54,11 +54,19 @@ function App() {
       const parsed = parseGas(msg);
       if (parsed) {
         setGasData(parsed.gas);
-        setAlertData(parsed.alert);
+
+        if (parsed.alert) {
+          const timestamp = Date.now();
+          const newAlerts = Array.isArray(parsed.alert)
+            ? parsed.alert.map((msg) => ({ message: msg, timestamp }))
+            : [{ message: parsed.alert, timestamp }];
+
+          setAlerts((prev) => [...prev, ...newAlerts]);
+        }
       }
     });
 
-    // Compressed camera feeds (Vision, Depth, USB only)
+    // Camera feeds (compressed)
     const cameraSubscribers = Object.entries(CAMERA_TOPICS).map(([label, topicName]) => {
       const sub = new ROSLIB.Topic({
         ros,
@@ -76,7 +84,7 @@ function App() {
       return sub;
     });
 
-    // Thermal feed (uncompressed sensor_msgs/Image)
+    // Thermal feed (sensor_msgs/Image)
     const thermalSub = new ROSLIB.Topic({
       ros,
       name: THERMAL_TOPIC,
@@ -116,7 +124,7 @@ function App() {
         <CameraSystem cameraFeeds={cameraFeeds} />
 
         <div style={{ gridArea: 'alerts' }}>
-          <AlertsPanel alert={alertData} />
+          <AlertsPanel alerts={alerts} setAlerts={setAlerts} />
         </div>
 
         <div style={{ gridArea: 'sensorblock' }}>
