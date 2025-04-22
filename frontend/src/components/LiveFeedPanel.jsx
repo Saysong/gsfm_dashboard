@@ -1,6 +1,7 @@
 import React from 'react';
 import GenericCameraFeed from './GenericCameraFeed';
 import ThermalCameraFeed from './ThermalCameraFeed';
+import RawCameraFeed from './RawCameraFeed';
 
 const cameraLabels = {
   Vision: 'Color Camera',
@@ -34,40 +35,44 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
         ))}
       </div>
 
-      {/* All Mode: 2x2 Grid */}
+      {/* All Mode: 2x2 Grid with Scroll */}
       {viewMode === 'All' ? (
         <div
           style={{
             flexGrow: 1,
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gridTemplateRows: '1fr 1fr',
-            gap: '0.5em',
+            overflowY: 'auto',
             padding: '0 0.5em 0.5em',
-            boxSizing: 'border-box',
-            height: '100%',
           }}
         >
-          {cameras.map((cam) => (
-            <div
-              key={cam}
-              style={{
-                width: '100%',
-                height: '100%',
-                minHeight: 0,
-                backgroundColor: '#111',
-                borderRadius: '6px',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {cam === 'Thermal' ? (
-                <ThermalCameraFeed message={cameraFeeds.Thermal} />
-              ) : (
-                <GenericCameraFeed title={cameraLabels[cam]} base64Data={cameraFeeds[cam]} />
-              )}
-            </div>
-          ))}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '0.5em',
+            }}
+          >
+            {cameras.map((cam) => (
+              <div
+                key={cam}
+                style={{
+                  width: '100%',
+                  aspectRatio: '4 / 3',
+                  backgroundColor: '#111',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {cam === 'Thermal' ? (
+                  <ThermalCameraFeed message={cameraFeeds.Thermal} />
+                ) : cam === 'USB' ? (
+                  <RawCameraFeed title={cameraLabels[cam]} message={cameraFeeds.USB} />
+                ) : (
+                  <GenericCameraFeed title={cameraLabels[cam]} base64Data={cameraFeeds[cam]} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         // Single Mode: Full-size centered feed
@@ -84,6 +89,8 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
         >
           {activeCamera === 'Thermal' ? (
             <ThermalCameraFeed message={cameraFeeds.Thermal} />
+          ) : activeCamera === 'USB' ? (
+            <RawCameraFeed title={cameraLabels.USB} message={cameraFeeds.USB} />
           ) : (
             <GenericCameraFeed title={cameraLabels[activeCamera]} base64Data={cameraFeeds[activeCamera]} />
           )}

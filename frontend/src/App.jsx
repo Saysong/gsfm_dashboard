@@ -15,7 +15,7 @@ import { parseCompressedImage } from './handlers/cameraHandler';
 import ROSLIB from 'roslib';
 
 function App() {
-  const { ros, connected } = useRosBridge('ws://10.91.19.146:9090'); // or your IP
+  const { ros, connected } = useRosBridge('ws://10.91.19.146:9090'); // Replace with your IP
 
   const [imuData, setImuData] = useState(null);
   const [gasData, setGasData] = useState(null);
@@ -42,7 +42,7 @@ function App() {
       if (parsed) setImuData(parsed);
     });
 
-    // Gas + Alert
+    // Gas
     const gasSub = new ROSLIB.Topic({
       ros,
       name: GAS_TOPIC,
@@ -55,11 +55,8 @@ function App() {
 
         if (parsed.alert) {
           const timestamp = Date.now();
-
           const newAlerts = Array.isArray(parsed.alert)
-            ? parsed.alert
-                .filter((msg) => typeof msg === 'string' && msg.trim().length > 0)
-                .map((msg) => ({ message: msg, timestamp }))
+            ? parsed.alert.filter((msg) => typeof msg === 'string').map((msg) => ({ message: msg, timestamp }))
             : typeof parsed.alert === 'string'
             ? [{ message: parsed.alert, timestamp }]
             : [];
@@ -71,7 +68,7 @@ function App() {
       }
     });
 
-    // Camera feeds (compressed)
+    // Compressed camera feeds
     const cameraSubscribers = Object.entries(CAMERA_TOPICS).map(([label, topicName]) => {
       const sub = new ROSLIB.Topic({
         ros,
@@ -89,7 +86,7 @@ function App() {
       return sub;
     });
 
-    // Thermal feed
+    // Thermal (uncompressed RGB8)
     const thermalSub = new ROSLIB.Topic({
       ros,
       name: THERMAL_TOPIC,
@@ -103,12 +100,28 @@ function App() {
       }));
     });
 
+    // USB camera (uncompressed RGB8)
+    const usbSub = new ROSLIB.Topic({
+      ros,
+      name: '/image_raw',
+      messageType: 'sensor_msgs/Image',
+    });
+
+    usbSub.subscribe((msg) => {
+      console.log('[USB Camera] Incoming message:', msg);
+      setCameraFeeds((prev) => ({
+        ...prev,
+        USB: msg,
+      }));
+    });
+
     // Cleanup
     return () => {
       imuSub.unsubscribe();
       gasSub.unsubscribe();
-      cameraSubscribers.forEach((sub) => sub.unsubscribe());
       thermalSub.unsubscribe();
+      usbSub.unsubscribe();
+      cameraSubscribers.forEach((sub) => sub.unsubscribe());
     };
   }, [ros]);
 

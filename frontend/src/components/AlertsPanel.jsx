@@ -14,19 +14,21 @@ function AlertsPanel({ alerts, setAlerts }) {
   };
 
   return (
-    <div style={{ color: 'white' }}>
+    <div style={{ color: 'white', height: '100%', overflowY: 'auto', paddingRight: '0.5em' }}>
       <h2>Alerts</h2>
       {alerts.length === 0 ? (
         <p>No active alerts</p>
       ) : (
-        alerts.map((alert, index) => (
-          <NotificationBubble
-            key={index}
-            message={alert.message}
-            timestamp={alert.timestamp}
-            onDismiss={() => dismissAlert(index)}
-          />
-        ))
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+          {alerts.map((alert, index) => (
+            <NotificationBubble
+              key={index}
+              message={alert.message}
+              timestamp={alert.timestamp}
+              onDismiss={() => dismissAlert(index)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
