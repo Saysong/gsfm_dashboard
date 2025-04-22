@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRosBridge } from './hooks/useRosBridge';
-import { CAMERA_TOPICS, IMU_TOPIC, GAS_TOPIC } from './constants/rosTopics';
+import { CAMERA_TOPICS, IMU_TOPIC, GAS_TOPIC, THERMAL_TOPIC } from './constants/rosTopics';
 
 import DashboardGrid from './components/DashboardGrid';
 import CameraSystem from './components/CameraSystem';
@@ -58,7 +58,7 @@ function App() {
       }
     });
 
-    // Camera Feeds
+    // Compressed camera feeds (Vision, Depth, USB only)
     const cameraSubscribers = Object.entries(CAMERA_TOPICS).map(([label, topicName]) => {
       const sub = new ROSLIB.Topic({
         ros,
@@ -76,11 +76,26 @@ function App() {
       return sub;
     });
 
+    // Thermal feed (uncompressed sensor_msgs/Image)
+    const thermalSub = new ROSLIB.Topic({
+      ros,
+      name: THERMAL_TOPIC,
+      messageType: 'sensor_msgs/Image',
+    });
+
+    thermalSub.subscribe((msg) => {
+      setCameraFeeds((prev) => ({
+        ...prev,
+        Thermal: msg,
+      }));
+    });
+
     // Cleanup
     return () => {
       imuSub.unsubscribe();
       gasSub.unsubscribe();
       cameraSubscribers.forEach((sub) => sub.unsubscribe());
+      thermalSub.unsubscribe();
     };
   }, [ros]);
 

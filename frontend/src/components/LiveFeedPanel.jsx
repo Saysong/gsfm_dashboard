@@ -2,6 +2,7 @@
 
 import React from 'react';
 import GenericCameraFeed from './GenericCameraFeed';
+import ThermalCameraFeed from './ThermalCameraFeed'; // <-- import thermal component
 
 const cameraLabels = {
   Vision: 'Color Camera',
@@ -72,7 +73,11 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
         >
           {cameras.map((cam) => (
             <div key={cam} style={{ backgroundColor: '#111', borderRadius: '6px' }}>
-              <GenericCameraFeed title={cameraLabels[cam]} base64Data={cameraFeeds[cam]} />
+              {cam === 'Thermal' ? (
+                <ThermalCameraFeed message={cameraFeeds.Thermal} />
+              ) : (
+                <GenericCameraFeed title={cameraLabels[cam]} base64Data={cameraFeeds[cam]} />
+              )}
             </div>
           ))}
         </div>
@@ -85,7 +90,11 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
             padding: '1em',
           }}
         >
-          <GenericCameraFeed title={cameraLabels[activeCamera]} base64Data={cameraFeeds[activeCamera]} />
+          {activeCamera === 'Thermal' ? (
+            <ThermalCameraFeed message={cameraFeeds.Thermal} />
+          ) : (
+            <GenericCameraFeed title={cameraLabels[activeCamera]} base64Data={cameraFeeds[activeCamera]} />
+          )}
         </div>
       )}
     </div>
