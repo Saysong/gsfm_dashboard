@@ -1,5 +1,3 @@
-// src/components/GenericCameraFeed.jsx
-
 import React, { useEffect, useRef } from 'react';
 
 const GenericCameraFeed = ({ title, base64Data }) => {
@@ -15,14 +13,15 @@ const GenericCameraFeed = ({ title, base64Data }) => {
         bytes[i] = binary.charCodeAt(i);
       }
 
-      const blob = new Blob([bytes], { type: 'image/jpeg' }); // change to 'image/png' if needed
+      const blob = new Blob([bytes], { type: 'image/jpeg' });
       const url = URL.createObjectURL(blob);
 
       const img = new Image();
       img.onload = () => {
-        const ctx = canvasRef.current.getContext('2d');
-        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
       };
       img.src = url;
@@ -32,13 +31,33 @@ const GenericCameraFeed = ({ title, base64Data }) => {
   }, [base64Data]);
 
   return (
-    <div>
-      <h4 style={{ color: 'white', marginBottom: '0.5em' }}>{title}</h4>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '6px',
+          left: '10px',
+          zIndex: 2,
+          color: 'white',
+          fontSize: '0.8em',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          padding: '2px 6px',
+          borderRadius: '4px',
+        }}
+      >
+        {title}
+      </div>
       <canvas
         ref={canvasRef}
         width={640}
         height={480}
-        style={{ border: '1px solid white', backgroundColor: '#000' }}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          borderRadius: '6px',
+          backgroundColor: '#000',
+        }}
       />
     </div>
   );

@@ -1,5 +1,3 @@
-// src/App.jsx
-
 import { useEffect, useState } from 'react';
 import { useRosBridge } from './hooks/useRosBridge';
 import { CAMERA_TOPICS, IMU_TOPIC, GAS_TOPIC, THERMAL_TOPIC } from './constants/rosTopics';
@@ -17,7 +15,7 @@ import { parseCompressedImage } from './handlers/cameraHandler';
 import ROSLIB from 'roslib';
 
 function App() {
-  const { ros, connected } = useRosBridge('ws://10.91.19.146:9090'); // Update IP as needed
+  const { ros, connected } = useRosBridge('ws://10.91.19.146:9090'); // or your IP
 
   const [imuData, setImuData] = useState(null);
   const [gasData, setGasData] = useState(null);
@@ -33,7 +31,7 @@ function App() {
   useEffect(() => {
     if (!ros) return;
 
-    // IMU subscription
+    // IMU
     const imuSub = new ROSLIB.Topic({
       ros,
       name: IMU_TOPIC,
@@ -44,7 +42,7 @@ function App() {
       if (parsed) setImuData(parsed);
     });
 
-    // Gas + Alert subscription
+    // Gas + Alert
     const gasSub = new ROSLIB.Topic({
       ros,
       name: GAS_TOPIC,
@@ -57,11 +55,18 @@ function App() {
 
         if (parsed.alert) {
           const timestamp = Date.now();
-          const newAlerts = Array.isArray(parsed.alert)
-            ? parsed.alert.map((msg) => ({ message: msg, timestamp }))
-            : [{ message: parsed.alert, timestamp }];
 
-          setAlerts((prev) => [...prev, ...newAlerts]);
+          const newAlerts = Array.isArray(parsed.alert)
+            ? parsed.alert
+                .filter((msg) => typeof msg === 'string' && msg.trim().length > 0)
+                .map((msg) => ({ message: msg, timestamp }))
+            : typeof parsed.alert === 'string'
+            ? [{ message: parsed.alert, timestamp }]
+            : [];
+
+          if (newAlerts.length > 0) {
+            setAlerts((prev) => [...prev, ...newAlerts]);
+          }
         }
       }
     });
@@ -84,7 +89,7 @@ function App() {
       return sub;
     });
 
-    // Thermal feed (sensor_msgs/Image)
+    // Thermal feed
     const thermalSub = new ROSLIB.Topic({
       ros,
       name: THERMAL_TOPIC,

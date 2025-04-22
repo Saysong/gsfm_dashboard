@@ -1,8 +1,6 @@
-// src/components/LiveFeedPanel.jsx
-
 import React from 'react';
 import GenericCameraFeed from './GenericCameraFeed';
-import ThermalCameraFeed from './ThermalCameraFeed'; // <-- import thermal component
+import ThermalCameraFeed from './ThermalCameraFeed';
 
 const cameraLabels = {
   Vision: 'Color Camera',
@@ -15,11 +13,9 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
   const cameras = ['Vision', 'Depth', 'USB', 'Thermal'];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <h2 style={{ color: 'white' }}>Live Feed</h2>
-
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* View Mode Toggle */}
-      <div style={{ marginBottom: '1em' }}>
+      <div style={{ marginBottom: '0.8em', paddingLeft: '0.5em' }}>
         {['All', 'Single'].map((mode) => (
           <button
             key={mode}
@@ -38,41 +34,33 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
         ))}
       </div>
 
-      {/* Camera Selector (when in Single view) */}
-      {viewMode === 'Single' && (
-        <div style={{ marginBottom: '1em' }}>
-          {cameras.map((cam) => (
-            <button
-              key={cam}
-              style={{
-                marginRight: '0.5em',
-                padding: '0.4em 0.8em',
-                backgroundColor: activeCamera === cam ? '#555' : '#222',
-                color: 'white',
-                border: '1px solid #666',
-                cursor: 'pointer',
-              }}
-              onClick={() => setActiveCamera(cam)}
-            >
-              {cameraLabels[cam]}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Camera Feeds */}
+      {/* All Mode: 2x2 Grid */}
       {viewMode === 'All' ? (
         <div
           style={{
+            flexGrow: 1,
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gridTemplateRows: '1fr 1fr',
-            gap: '1em',
-            flexGrow: 1,
+            gap: '0.5em',
+            padding: '0 0.5em 0.5em',
+            boxSizing: 'border-box',
+            height: '100%',
           }}
         >
           {cameras.map((cam) => (
-            <div key={cam} style={{ backgroundColor: '#111', borderRadius: '6px' }}>
+            <div
+              key={cam}
+              style={{
+                width: '100%',
+                height: '100%',
+                minHeight: 0,
+                backgroundColor: '#111',
+                borderRadius: '6px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
               {cam === 'Thermal' ? (
                 <ThermalCameraFeed message={cameraFeeds.Thermal} />
               ) : (
@@ -82,12 +70,16 @@ function LiveFeedPanel({ viewMode, setViewMode, activeCamera, setActiveCamera, c
           ))}
         </div>
       ) : (
+        // Single Mode: Full-size centered feed
         <div
           style={{
             flexGrow: 1,
-            backgroundColor: '#111',
-            borderRadius: '6px',
-            padding: '1em',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '0.5em',
+            height: '100%',
+            boxSizing: 'border-box',
           }}
         >
           {activeCamera === 'Thermal' ? (
